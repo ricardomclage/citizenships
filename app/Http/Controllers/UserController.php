@@ -35,9 +35,6 @@ class UserController extends Controller
 
     public function update(Request $request, UserModel $user)
     {
-        // if (empty($request->all())) {
-        //     abort(400, "Empty Request");
-        // }
         return $this->userService->update($user, $request->all());
     }
 
