@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use App\Models\UserDetails;
 use Tests\TestCase;
@@ -16,15 +15,21 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function test_delete_user()
+    public function test_delete_user_with_details()
     {
-        $userWithNoDetails = User::factory()->create();
         $userWithDetails = User::factory()
             ->has(UserDetails::factory())
             ->create();
         $response = $this->delete('api/users/' . $userWithDetails->id);
-        $response->assertStatus(403);
+        $response->assertJson(['error_message' => 'This user cannot be deleted']);
+        $this->assertModelExists($userWithDetails);
+    }
+
+    public function test_delete_user_with_no_details()
+    {
+        $userWithNoDetails = User::factory()->create();
         $response = $this->delete('api/users/' . $userWithNoDetails->id);
         $response->assertStatus(200);
+        $this->assertModelMissing($userWithNoDetails);
     }
 }

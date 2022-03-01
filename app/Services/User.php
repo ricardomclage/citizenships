@@ -2,15 +2,18 @@
 
 namespace App\Services;
 
+use App\Exceptions\UserCannotBeDeletedException;
+use App\Exceptions\UserCannotBeUpdatedException;
 use App\Models\User as UserModel;
 use Carbon\Carbon;
+use Exception;
 
 class User
 {
     public function update(UserModel $user, $params)
     {
         if (!$user->userDetails) {
-            abort(403, 'User has no details to be updated');
+            throw new UserCannotBeUpdatedException();
         }
         $user->userDetails->update([
             'first_name' => $params['first_name'] ?? $user->userDetails->first_name,
@@ -26,7 +29,7 @@ class User
     public function delete(UserModel $user)
     {
         if ($user->userDetails) {
-            abort(403, 'User cannot be deleted');
+            throw new UserCannotBeDeletedException();
         }
         return $user->delete();
     }
